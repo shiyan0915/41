@@ -38,8 +38,6 @@ if __name__ == "__main__":
     li_list=tree.xpath('//div[@class="box-gl clearfix"]/ul[1]/li')
     #print(li_list)
     number=tree.xpath('//div[@class="ecms_pag"]/div[1]/div[1]/span[1]/span[9]/a/text()')[0]#总页数
-    fp = open('2.1教务处.txt', 'w', encoding='utf-8')
-    fp.write(number)
     notice=[]
     while 1:
         page=0
