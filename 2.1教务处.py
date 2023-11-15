@@ -13,7 +13,22 @@
 import requests
 from lxml import html
 etree=html.etree
+import pymysql
+
 if __name__ == "__main__":
+
+    db = pymysql.connect(
+    host="localhost",
+    user="shiyan",
+    password="123456",
+    database = "fzu"
+    )
+
+    cursor = db.cursor()
+
+    cursor.execute("CREATE DATABASE if not exists fzu")
+
+
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36 Edg/118.0.2088.76'
     }
@@ -24,6 +39,7 @@ if __name__ == "__main__":
     #print(li_list)
     number=tree.xpath('//div[@class="ecms_pag"]/div[1]/div[1]/span[1]/span[9]/a/text()')[0]#总页数
     fp = open('2.1教务处.txt', 'w', encoding='utf-8')
+    fp.write(number)
     notice=[]
     while 1:
         page=0
@@ -47,20 +63,18 @@ if __name__ == "__main__":
             detail_title=detail_tree.xpath('//div[@class="wapper"]/form[1]/div[1]/div[1]/div[1]/div[1]/h4/text()')[0]#标题
             detail_time=detail_tree.xpath('//div[@class="wapper"]/form[1]/div[1]/div[1]/div[1]/div[2]/div[1]/span/text()')[0]#日期
             notice.append(detail_title)
-            fp.write(detail_url)
-            fp.write(detail_name)
-            fp.write(detail_title)
-            fp.write(detail_time)
+            sql = "insert into notice (detail_name,detail_title,detail_url,detail_time) values('%s','%s','%s','%s')" % (detail_name, detail_title, detail_url, detail_time)
+            cursor.execute(sql)
             if detail_tree.xpath('//ul[@style="list-style-type:none;"]')!=[]:#附件
                 fujian_list=detail_tree.xpath('//ul[@style="list-style-type:none;"]/li')
                 for fujian in fujian_list:
                     fujian_title=fujian.xpath('./a/text()')[0]#附件名
                     #fujian_cishu=fujian.xpath('./span/text()')[0]#附件下载次数
                     fujian_url=fujian.xpath('./a/@href')[0]#附件链接
-                    fp.write(fujian_title)
-                    #fp.write(fujian_cishu)
-                    fp.write(fujian_url)
             print("爬取成功")
+
+        cursor.close()
+        db.close()
 
 
 
